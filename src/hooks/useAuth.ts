@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
-import { getStoredUser, storeUser, clearUser, StoredUser } from '@/lib/storage';
+import { useState } from 'react';
 
 export type UserProfile = {
   id: string;
   name: string;
   email: string;
+};
+
+const DEFAULT_USER: UserProfile = {
+  id: 'default-user',
+  name: 'Trader',
+  email: 'trader@platform.com',
 };
 
 type AuthState = {
@@ -20,61 +25,15 @@ type AuthHook = AuthState & {
 };
 
 export function useAuth(): AuthHook {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    loading: true,
+  const [state] = useState<AuthState>({
+    user: DEFAULT_USER,
+    profile: DEFAULT_USER,
+    loading: false,
   });
 
-  useEffect(() => {
-    const stored = getStoredUser();
-    if (stored) {
-      const profile: UserProfile = { id: stored.id, name: stored.name, email: stored.email };
-      setState({ user: profile, profile, loading: false });
-    } else {
-      setState(s => ({ ...s, loading: false }));
-    }
-  }, []);
-
-  const login = async (email: string, password: string): Promise<void> => {
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
-    const stored = getStoredUser();
-    if (stored && stored.email === email) {
-      const profile: UserProfile = { id: stored.id, name: stored.name, email: stored.email };
-      setState({ user: profile, profile, loading: false });
-      return;
-    }
-    // Demo: accept any credentials and create a session
-    const profile: UserProfile = {
-      id: crypto.randomUUID(),
-      name: email.split('@')[0],
-      email,
-    };
-    const toStore: StoredUser = { ...profile };
-    storeUser(toStore);
-    setState({ user: profile, profile, loading: false });
-  };
-
-  const signup = async (name: string, email: string, password: string): Promise<void> => {
-    if (!name || !email || !password) {
-      throw new Error('All fields are required');
-    }
-    const profile: UserProfile = {
-      id: crypto.randomUUID(),
-      name,
-      email,
-    };
-    const toStore: StoredUser = { ...profile };
-    storeUser(toStore);
-    setState({ user: profile, profile, loading: false });
-  };
-
-  const logout = () => {
-    clearUser();
-    setState({ user: null, profile: null, loading: false });
-  };
+  const login = async (_email: string, _password: string): Promise<void> => {};
+  const signup = async (_name: string, _email: string, _password: string): Promise<void> => {};
+  const logout = () => {};
 
   return { ...state, login, signup, logout };
 }
