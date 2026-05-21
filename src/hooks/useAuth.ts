@@ -1,80 +1,80 @@
-import { useState, useCallback } from 'react';
-import { UserProfile } from '@/types';
-import { loadProfile, saveProfile, clearProfile } from '@/lib/storage';
+import { useState, useEffect } from 'react';
+import { getStoredUser, storeUser, clearUser, StoredUser } from '@/lib/storage';
 
-interface AuthState {
-  profile: UserProfile | null;
-  isAuthenticated: boolean;
-}
-
-const DEFAULT_PROFILE: UserProfile = {
-  id: 'default-user',
-  name: 'Demo Trader',
-  email: 'demo@alphaedge.app',
-  plan: 'pro',
-  riskTolerance: 'medium',
-  joinedAt: new Date().toISOString(),
-  tradingStyle: 'Swing Trading',
-  experience: 'Intermediate',
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
 };
 
-export function useAuth() {
-  const [state, setState] = useState<AuthState>(() => {
-    const stored = loadProfile();
-    if (stored) {
-      return { profile: stored, isAuthenticated: true };
-    }
-    // Auto-login with default profile for demo
-    saveProfile(DEFAULT_PROFILE);
-    return { profile: DEFAULT_PROFILE, isAuthenticated: true };
+type AuthState = {
+  user: UserProfile | null;
+  profile: UserProfile | null;
+  loading: boolean;
+};
+
+type AuthHook = AuthState & {
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+};
+
+export function useAuth(): AuthHook {
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    profile: null,
+    loading: true,
   });
 
-  const login = useCallback((email: string, _password: string) => {
-    const newProfile: UserProfile = {
+  useEffect(() => {
+    const stored = getStoredUser();
+    if (stored) {
+      const profile: UserProfile = { id: stored.id, name: stored.name, email: stored.email };
+      setState({ user: profile, profile, loading: false });
+    } else {
+      setState(s => ({ ...s, loading: false }));
+    }
+  }, []);
+
+  const login = async (email: string, password: string): Promise<void> => {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+    const stored = getStoredUser();
+    if (stored && stored.email === email) {
+      const profile: UserProfile = { id: stored.id, name: stored.name, email: stored.email };
+      setState({ user: profile, profile, loading: false });
+      return;
+    }
+    // Demo: accept any credentials and create a session
+    const profile: UserProfile = {
       id: crypto.randomUUID(),
       name: email.split('@')[0],
       email,
-      plan: 'free',
-      riskTolerance: 'medium',
-      joinedAt: new Date().toISOString(),
     };
-    saveProfile(newProfile);
-    setState({ profile: newProfile, isAuthenticated: true });
-  }, []);
+    const toStore: StoredUser = { ...profile };
+    storeUser(toStore);
+    setState({ user: profile, profile, loading: false });
+  };
 
-  const signup = useCallback((name: string, email: string, _password: string) => {
-    const newProfile: UserProfile = {
+  const signup = async (name: string, email: string, password: string): Promise<void> => {
+    if (!name || !email || !password) {
+      throw new Error('All fields are required');
+    }
+    const profile: UserProfile = {
       id: crypto.randomUUID(),
       name,
       email,
-      plan: 'free',
-      riskTolerance: 'medium',
-      joinedAt: new Date().toISOString(),
     };
-    saveProfile(newProfile);
-    setState({ profile: newProfile, isAuthenticated: true });
-  }, []);
-
-  const logout = useCallback(() => {
-    clearProfile();
-    setState({ profile: null, isAuthenticated: false });
-  }, []);
-
-  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
-    setState((prev) => {
-      if (!prev.profile) return prev;
-      const updated = { ...prev.profile, ...updates };
-      saveProfile(updated);
-      return { ...prev, profile: updated };
-    });
-  }, []);
-
-  return {
-    profile: state.profile,
-    isAuthenticated: state.isAuthenticated,
-    login,
-    signup,
-    logout,
-    updateProfile,
+    const toStore: StoredUser = { ...profile };
+    storeUser(toStore);
+    setState({ user: profile, profile, loading: false });
   };
+
+  const logout = () => {
+    clearUser();
+    setState({ user: null, profile: null, loading: false });
+  };
+
+  return { ...state, login, signup, logout };
 }

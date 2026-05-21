@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import styles from './AuthPages.module.css';
@@ -12,57 +12,63 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const result = await login(email, password);
-      if (result.error) {
-        setError(result.error);
-      } else {
-        navigate('/');
-      }
+      await login(email, password);
+      navigate('/');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <AuthLayout>
       <div className={styles.card}>
-        <h1 className={styles.title}>Welcome back</h1>
-        <p className={styles.subtitle}>Sign in to your AlphaEdge account</p>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Welcome back</h1>
+          <p className={styles.subtitle}>Sign in to your AlphaEdge account</p>
+        </div>
+
+        {error && <div className={styles.errorBanner}>{error}</div>}
+
         <form onSubmit={handleSubmit} className={styles.form}>
-          {error && <div className={styles.error}>{error}</div>}
           <div className={styles.field}>
             <label className={styles.label}>Email</label>
             <input
               type="email"
+              className={styles.input}
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className={styles.input}
-              placeholder="you@example.com"
+              placeholder="trader@example.com"
               required
             />
           </div>
+
           <div className={styles.field}>
             <label className={styles.label}>Password</label>
             <input
               type="password"
+              className={styles.input}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className={styles.input}
               placeholder="••••••••"
               required
             />
           </div>
-          <button type="submit" className={styles.btn} disabled={loading}>
+
+          <button type="submit" className={styles.submitBtn} disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <p className={styles.footer}>
-          Don't have an account? <Link to="/signup" className={styles.link}>Sign up</Link>
+
+        <p className={styles.switchText}>
+          Don't have an account?{' '}
+          <Link to="/signup" className={styles.switchLink}>Sign up</Link>
         </p>
       </div>
     </AuthLayout>
