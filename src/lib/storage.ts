@@ -1,42 +1,48 @@
 import { UserProfile, AppSettings } from '@/types';
 
-const PROFILE_KEY = 'alphaedge_profile';
-const SETTINGS_KEY = 'alphaedge_settings';
+const KEYS = {
+  PROFILE: 'user_profile',
+  SETTINGS: 'app_settings',
+  WATCHLIST: 'watchlist',
+  ONBOARDING: 'onboarding_complete',
+};
 
-export function loadProfile(): UserProfile | null {
-  try {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    return raw ? (JSON.parse(raw) as UserProfile) : null;
-  } catch {
-    return null;
-  }
-}
+export const storage = {
+  getProfile(): UserProfile | null {
+    try {
+      const raw = localStorage.getItem(KEYS.PROFILE);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  },
 
-export function saveProfile(profile: UserProfile): void {
-  try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-  } catch {
-    // ignore
-  }
-}
+  setProfile(profile: UserProfile): void {
+    localStorage.setItem(KEYS.PROFILE, JSON.stringify(profile));
+  },
 
-export function clearProfile(): void {
-  localStorage.removeItem(PROFILE_KEY);
-}
+  getSettings(): AppSettings | null {
+    try {
+      const raw = localStorage.getItem(KEYS.SETTINGS);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  },
 
-export function loadSettings(): AppSettings | null {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? (JSON.parse(raw) as AppSettings) : null;
-  } catch {
-    return null;
-  }
-}
+  setSettings(settings: AppSettings): void {
+    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
+  },
 
-export function saveSettings(settings: AppSettings): void {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  } catch {
-    // ignore
-  }
-}
+  isOnboardingComplete(): boolean {
+    return localStorage.getItem(KEYS.ONBOARDING) === 'true';
+  },
+
+  setOnboardingComplete(): void {
+    localStorage.setItem(KEYS.ONBOARDING, 'true');
+  },
+
+  clear(): void {
+    Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
+  },
+};

@@ -1,51 +1,63 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { UserProfile } from '@/types';
-import { loadProfile, saveProfile } from '@/lib/storage';
 
-export type AuthHook = {
+export interface AuthHook {
   profile: UserProfile | null;
-  updateProfile: (updates: Partial<UserProfile>) => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   logout: () => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
+}
+
+const DEFAULT_PROFILE: UserProfile = {
+  id: '1',
+  name: 'Alex Trader',
+  email: 'alex@alphaedge.io',
+  riskTolerance: 'moderate',
+  tradingStyle: 'mixed',
+  experience: 'intermediate',
+  preferredSectors: ['Technology', 'Healthcare', 'Finance'],
 };
 
 export function useAuth(): AuthHook {
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    const saved = loadProfile();
-    if (saved) return saved;
-    return {
-      id: 'local-user',
-      name: 'Trader',
-      email: 'trader@alphaedge.com',
-      plan: 'free',
-      tradingStyle: 'swing',
-      experience: 'intermediate',
-      riskTolerance: 'medium',
-    };
-  });
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user_profile');
+      if (stored) {
+        setProfile(JSON.parse(stored));
+      } else {
+        setProfile(DEFAULT_PROFILE);
+        localStorage.setItem('user_profile', JSON.stringify(DEFAULT_PROFILE));
+      }
+    } catch {
+      setProfile(DEFAULT_PROFILE);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem('user_profile');
+    setProfile(null);
+  };
+
+  const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, ...updates };
-      saveProfile(next);
-      return next;
+      const updated = { ...prev, ...updates };
+      localStorage.setItem('user_profile', JSON.stringify(updated));
+      return updated;
     });
-  }, []);
+  };
 
-  const logout = useCallback(() => {
-    // client-side only — just reset to default
-    const defaultProfile: UserProfile = {
-      id: 'local-user',
-      name: 'Trader',
-      email: 'trader@alphaedge.com',
-      plan: 'free',
-      tradingStyle: 'swing',
-      experience: 'intermediate',
-      riskTolerance: 'medium',
-    };
-    setProfile(defaultProfile);
-    saveProfile(defaultProfile);
-  }, []);
-
-  return { profile, updateProfile, logout };
+  return {
+    profile,
+    isAuthenticated: !!profile,
+    isLoading,
+    logout,
+    updateProfile,
+  };
 }

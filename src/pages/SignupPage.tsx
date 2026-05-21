@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { AuthLayout } from '@/components/auth/AuthLayout';
+import { useNavigate } from 'react-router-dom';
 import styles from './AuthPages.module.css';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { Card } from '@/components/ui/Card';
 
 export function SignupPage() {
-  const { signup } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,10 +17,20 @@ export function SignupPage() {
     setError('');
     setLoading(true);
     try {
-      await signup(name, email, password);
+      // Simulate signup - store a profile in localStorage
+      const profile = {
+        id: Date.now().toString(),
+        name: name || email.split('@')[0] || 'Trader',
+        email,
+        riskTolerance: 'moderate' as const,
+        tradingStyle: 'mixed' as const,
+        experience: 'beginner' as const,
+        preferredSectors: ['Technology'],
+      };
+      localStorage.setItem('user_profile', JSON.stringify(profile));
       navigate('/');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Signup failed');
+    } catch {
+      setError('Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -29,61 +38,52 @@ export function SignupPage() {
 
   return (
     <AuthLayout>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Create account</h1>
-          <p className={styles.subtitle}>Start trading smarter with AlphaEdge</p>
-        </div>
-
-        {error && <div className={styles.errorBanner}>{error}</div>}
-
+      <Card padding="lg" className={styles.card}>
+        <h1 className={styles.title}>Create account</h1>
+        <p className={styles.subtitle}>Join AlphaEdge and start trading smarter</p>
+        {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label className={styles.label}>Name</label>
             <input
               type="text"
-              className={styles.input}
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
+              className={styles.input}
               placeholder="Your name"
-              required
             />
           </div>
-
           <div className={styles.field}>
             <label className={styles.label}>Email</label>
             <input
               type="email"
-              className={styles.input}
               value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="trader@example.com"
+              onChange={(e) => setEmail(e.target.value)}
+              className={styles.input}
+              placeholder="you@example.com"
               required
             />
           </div>
-
           <div className={styles.field}>
             <label className={styles.label}>Password</label>
             <input
               type="password"
-              className={styles.input}
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.input}
               placeholder="••••••••"
               required
             />
           </div>
-
           <button type="submit" className={styles.submitBtn} disabled={loading}>
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
-
         <p className={styles.switchText}>
           Already have an account?{' '}
-          <Link to="/login" className={styles.switchLink}>Sign in</Link>
+          <a href="/login" className={styles.link}>Sign in</a>
         </p>
-      </div>
+      </Card>
     </AuthLayout>
   );
 }
