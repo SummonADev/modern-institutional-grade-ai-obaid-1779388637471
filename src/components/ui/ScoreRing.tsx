@@ -3,49 +3,30 @@ import styles from './ScoreRing.module.css';
 type ScoreRingProps = {
   score: number;
   size?: number;
-  strokeWidth?: number;
-  label?: string;
 };
 
-export function ScoreRing({ score, size = 64, strokeWidth = 5, label }: ScoreRingProps) {
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (score / 100) * circumference;
-
-  const color =
-    score >= 80 ? '#22c55e' :
-    score >= 70 ? '#60a5fa' :
-    score >= 60 ? '#f59e0b' :
-    '#ef4444';
+export function ScoreRing({ score, size = 60 }: ScoreRingProps) {
+  const radius = (size - 8) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (score / 100) * circumference;
+  const color = score >= 75 ? '#22c55e' : score >= 50 ? '#60a5fa' : score >= 30 ? '#f59e0b' : '#ef4444';
 
   return (
     <div className={styles.wrapper} style={{ width: size, height: size }}>
-      <svg width={size} height={size} className={styles.svg}>
+      <svg className={styles.svg} width={size} height={size}>
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={4} />
         <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="rgba(255,255,255,0.05)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke={color} strokeWidth={4}
           strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          strokeDashoffset={circumference - progress}
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: 'stroke-dashoffset 0.8s ease' }}
         />
       </svg>
       <div className={styles.center}>
-        <span className={styles.score} style={{ color }}>{score}</span>
-        {label && <span className={styles.label}>{label}</span>}
+        <span className={styles.score} style={{ color, fontSize: size < 50 ? '11px' : '14px' }}>{score}</span>
+        {size >= 50 && <span className={styles.label}>AI</span>}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import styles from './AuthPages.module.css';
@@ -9,62 +9,40 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      return;
-    }
-    const success = login(email, password);
-    if (success) {
-      navigate('/');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.error) {
+      setError(result.error);
     } else {
-      setError('Invalid credentials.');
+      navigate('/onboarding');
     }
-  }
+  };
 
   return (
     <div className={styles.formCard}>
-      <div className={styles.formHeader}>
-        <h1 className={styles.formTitle}>Welcome back</h1>
-        <p className={styles.formSubtitle}>Sign in to your AlphaEdge account</p>
-      </div>
-
+      <h2 className={styles.title}>Welcome back</h2>
+      <p className={styles.subtitle}>Sign in to your AlphaEdge account</p>
+      {error && <div className={styles.error}>{error}</div>}
       <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.errorMsg}>{error}</div>}
-
         <div className={styles.field}>
           <label className={styles.label}>Email</label>
-          <input
-            type="email"
-            className={styles.input}
-            placeholder="you@firm.com"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          />
+          <input className={styles.input} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required autoFocus />
         </div>
-
         <div className={styles.field}>
           <label className={styles.label}>Password</label>
-          <input
-            type="password"
-            className={styles.input}
-            placeholder="••••••••"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-          />
+          <input className={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
         </div>
-
-        <button type="submit" className={styles.submitBtn}>
-          Sign In
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
-
-      <p className={styles.switchLink}>
-        Don't have an account? <Link to="/signup" className={styles.link}>Create account</Link>
-      </p>
+      <p className={styles.switchAuth}>Don't have an account? <Link to="/signup" className={styles.link}>Sign up</Link></p>
     </div>
   );
 }

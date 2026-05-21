@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import styles from './AuthPages.module.css';
@@ -10,73 +10,44 @@ export function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name || !email || !password) {
-      setError('Please fill in all fields.');
-      return;
+    setLoading(true);
+    const result = await signup(name, email, password);
+    setLoading(false);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      navigate('/onboarding');
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
-    signup(name, email, password);
-    navigate('/onboarding');
-  }
+  };
 
   return (
     <div className={styles.formCard}>
-      <div className={styles.formHeader}>
-        <h1 className={styles.formTitle}>Create your account</h1>
-        <p className={styles.formSubtitle}>Join AlphaEdge — institutional-grade AI investing</p>
-      </div>
-
+      <h2 className={styles.title}>Create account</h2>
+      <p className={styles.subtitle}>Join AlphaEdge and start trading smarter</p>
+      {error && <div className={styles.error}>{error}</div>}
       <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.errorMsg}>{error}</div>}
-
         <div className={styles.field}>
           <label className={styles.label}>Full Name</label>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="John Smith"
-            value={name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-          />
+          <input className={styles.input} type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" required autoFocus />
         </div>
-
         <div className={styles.field}>
           <label className={styles.label}>Email</label>
-          <input
-            type="email"
-            className={styles.input}
-            placeholder="you@firm.com"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          />
+          <input className={styles.input} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
         </div>
-
         <div className={styles.field}>
           <label className={styles.label}>Password</label>
-          <input
-            type="password"
-            className={styles.input}
-            placeholder="••••••••"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-          />
+          <input className={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
         </div>
-
-        <button type="submit" className={styles.submitBtn}>
-          Create Account
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
+          {loading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
-
-      <p className={styles.switchLink}>
-        Already have an account? <Link to="/login" className={styles.link}>Sign in</Link>
-      </p>
+      <p className={styles.switchAuth}>Already have an account? <Link to="/login" className={styles.link}>Sign in</Link></p>
     </div>
   );
 }

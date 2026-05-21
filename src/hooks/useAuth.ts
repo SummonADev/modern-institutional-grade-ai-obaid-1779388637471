@@ -1,57 +1,78 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getSession, saveSession, clearSession, getProfile, saveProfile } from '@/lib/storage';
-import type { UserProfile } from '@/types';
+import { useState, useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
-export function useAuth() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  onboardingComplete: boolean;
+  tradingStyle?: string;
+  experience?: string;
+};
+
+type AuthState = {
+  isLoggedIn: boolean;
+  isLoading: boolean;
+  profile: UserProfile | null;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  signup: (name: string, email: string, password: string) => Promise<{ error?: string }>;
+  logout: () => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
+};
+
+export function useAuth(): AuthState {
+  const [storedProfile, setStoredProfile] = useLocalStorage<UserProfile | null>('auth_profile', null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const session = getSession();
-    if (session?.loggedIn) {
-      setIsLoggedIn(true);
-      setProfile(getProfile());
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const login = async (email: string, _password: string): Promise<{ error?: string }> => {
+    if (!email) return { error: 'Email is required' };
+    if (storedProfile && storedProfile.email === email) {
+      return {};
     }
-    setIsLoading(false);
-  }, []);
+    const profile: UserProfile = {
+      id: crypto.randomUUID(),
+      name: email.split('@')[0],
+      email,
+      onboardingComplete: false,
+    };
+    setStoredProfile(profile);
+    return {};
+  };
 
-  const login = useCallback((email: string, _password: string): boolean => {
-    // Mock auth — accept any credentials
-    saveSession(email);
-    const p = getProfile();
-    p.email = email;
-    if (!p.name) p.name = email.split('@')[0];
-    saveProfile(p);
-    setProfile(p);
-    setIsLoggedIn(true);
-    return true;
-  }, []);
+  const signup = async (name: string, email: string, _password: string): Promise<{ error?: string }> => {
+    if (!name || !email) return { error: 'All fields are required' };
+    const profile: UserProfile = {
+      id: crypto.randomUUID(),
+      name,
+      email,
+      onboardingComplete: false,
+    };
+    setStoredProfile(profile);
+    return {};
+  };
 
-  const signup = useCallback((name: string, email: string, _password: string): boolean => {
-    saveSession(email);
-    const p = getProfile();
-    p.name = name;
-    p.email = email;
-    p.onboardingComplete = false;
-    saveProfile(p);
-    setProfile(p);
-    setIsLoggedIn(true);
-    return true;
-  }, []);
+  const logout = () => {
+    setStoredProfile(null);
+  };
 
-  const logout = useCallback(() => {
-    clearSession();
-    setIsLoggedIn(false);
-    setProfile(null);
-  }, []);
+  const updateProfile = (updates: Partial<UserProfile>) => {
+    if (storedProfile) {
+      setStoredProfile({ ...storedProfile, ...updates });
+    }
+  };
 
-  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
-    const current = getProfile();
-    const updated = { ...current, ...updates };
-    saveProfile(updated);
-    setProfile(updated);
-  }, []);
-
-  return { isLoggedIn, isLoading, profile, login, signup, logout, updateProfile };
+  return {
+    isLoggedIn: !!storedProfile,
+    isLoading,
+    profile: storedProfile,
+    login,
+    signup,
+    logout,
+    updateProfile,
+  };
 }
