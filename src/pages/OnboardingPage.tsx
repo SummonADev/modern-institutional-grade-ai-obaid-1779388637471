@@ -1,60 +1,57 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { UserProfile } from '@/types';
 
 export function OnboardingPage() {
   const { updateProfile } = useAuth();
   const navigate = useNavigate();
-  const [tradingStyle, setTradingStyle] = useState('');
-  const [experience, setExperience] = useState('');
+  const [tradingStyle, setTradingStyle] = useState<UserProfile['tradingStyle']>('swing');
+  const [experience, setExperience] = useState<UserProfile['experience']>('intermediate');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     updateProfile({ tradingStyle, experience });
     navigate('/');
   };
 
   return (
     <div style={{ padding: '2rem', maxWidth: 480, margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '1.5rem', color: 'var(--color-text-primary)' }}>Welcome! Tell us about yourself</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
-            Trading Style
-          </label>
-          <select
-            value={tradingStyle}
-            onChange={e => setTradingStyle(e.target.value)}
-            style={{ width: '100%', padding: '8px 12px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)' }}
-          >
-            <option value="">Select...</option>
-            <option value="Day Trading">Day Trading</option>
-            <option value="Swing Trading">Swing Trading</option>
-            <option value="Long-Term Investing">Long-Term Investing</option>
-          </select>
-        </div>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
-            Experience Level
-          </label>
-          <select
-            value={experience}
-            onChange={e => setExperience(e.target.value)}
-            style={{ width: '100%', padding: '8px 12px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)' }}
-          >
-            <option value="">Select...</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
-        </div>
-        <button
-          type="submit"
-          style={{ width: '100%', padding: '10px', background: 'var(--color-accent-blue)', border: 'none', borderRadius: 'var(--radius-md)', color: 'white', fontWeight: 600, cursor: 'pointer' }}
+      <h2 style={{ color: 'var(--color-text-primary)', marginBottom: '1.5rem' }}>Welcome! Let's set up your profile</h2>
+
+      <div style={{ marginBottom: '1.5rem' }}>
+        <label style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8 }}>Trading Style</label>
+        <select
+          value={tradingStyle}
+          onChange={e => setTradingStyle(e.target.value as UserProfile['tradingStyle'])}
+          style={{ width: '100%', padding: '8px 12px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 6, color: 'var(--color-text-primary)' }}
         >
-          Get Started
-        </button>
-      </form>
+          <option value="day-trading">Day Trading</option>
+          <option value="swing">Swing Trading</option>
+          <option value="long-term">Long-Term</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <label style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8 }}>Experience Level</label>
+        <select
+          value={experience}
+          onChange={e => setExperience(e.target.value as UserProfile['experience'])}
+          style={{ width: '100%', padding: '8px 12px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 6, color: 'var(--color-text-primary)' }}
+        >
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+          <option value="professional">Professional</option>
+        </select>
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        style={{ width: '100%', padding: '10px', background: 'var(--color-accent-blue)', border: 'none', borderRadius: 6, color: 'white', fontWeight: 600, cursor: 'pointer' }}
+      >
+        Get Started
+      </button>
     </div>
   );
 }
