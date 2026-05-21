@@ -1,0 +1,67 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.glow1 {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.glow2 {
+  position: absolute;
+  bottom: -100px;
+  right: 10%;
+  width: 400px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(34, 197, 94, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--color-text-primary);
+}

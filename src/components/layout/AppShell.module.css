@@ -1,0 +1,26 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.main {
+  flex: 1;
+  margin-left: 220px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--transition-normal);
+  overflow: hidden;
+}
+
+.mainCollapsed {
+  margin-left: 64px;
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-6);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
