@@ -2,13 +2,10 @@ export type UserProfile = {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
-};
-
-export type AppSettings = {
-  theme: 'dark' | 'light';
-  notifications: boolean;
-  riskLevel: 'conservative' | 'moderate' | 'aggressive';
+  plan?: string;
+  tradingStyle?: string;
+  experience?: string;
+  riskTolerance?: string;
 };
 
 export type Stock = {
@@ -23,7 +20,7 @@ export type Stock = {
   aiScore?: number;
   momentum?: number;
   sentiment?: number;
-  risk?: number;
+  technical?: number;
   sparkline?: number[];
 };
 
@@ -41,7 +38,7 @@ export type Alert = {
   message: string;
   timestamp: string;
   read: boolean;
-  type: 'bullish' | 'bearish' | 'neutral';
+  type?: 'bullish' | 'bearish' | 'neutral';
 };
 
 export type NewsItem = {
@@ -50,20 +47,8 @@ export type NewsItem = {
   source: string;
   timestamp: string;
   sentiment: 'bullish' | 'bearish' | 'neutral';
-  tickers: string[];
+  tickers?: string[];
   summary?: string;
-};
-
-export type Position = {
-  symbol: string;
-  name: string;
-  shares: number;
-  avgCost: number;
-  currentPrice: number;
-  value: number;
-  pnl: number;
-  pnlPercent: number;
-  sector?: string;
 };
 
 export type WatchlistItem = {
@@ -72,26 +57,31 @@ export type WatchlistItem = {
   price: number;
   change: number;
   changePercent: number;
-  aiScore?: number;
+  alertPrice?: number;
   notes?: string;
 };
 
 export type Trade = {
   id: string;
   symbol: string;
-  side: 'buy' | 'sell';
-  shares: number;
-  price: number;
-  timestamp: string;
-  pnl?: number;
-  status: 'open' | 'closed' | 'pending';
+  side: 'long' | 'short';
+  entry: number;
+  current: number;
+  size: number;
+  pnl: number;
+  pnlPercent: number;
+  openedAt: string;
 };
 
-export type PortfolioSummary = {
-  totalValue: number;
-  dayPnl: number;
-  dayPnlPercent: number;
-  totalPnl: number;
-  totalPnlPercent: number;
-  cash: number;
+export type PortfolioPosition = {
+  symbol: string;
+  name: string;
+  shares: number;
+  avgCost: number;
+  current: number;
+  value: number;
+  pnl: number;
+  pnlPercent: number;
+  allocation: number;
+  sector?: string;
 };
