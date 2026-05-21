@@ -1,18 +1,13 @@
-export interface UserProfile {
+export type UserProfile = {
   id: string;
   name: string;
   email: string;
-  tradingStyle?: string;
-  experience?: string;
-}
+  plan: 'free' | 'pro' | 'elite';
+  riskTolerance: 'conservative' | 'moderate' | 'aggressive';
+  joinedAt: string;
+};
 
-export interface AppSettings {
-  theme: 'dark' | 'light';
-  notifications: boolean;
-  riskLevel: 'conservative' | 'moderate' | 'aggressive';
-}
-
-export interface Stock {
+export type Stock = {
   symbol: string;
   name: string;
   price: number;
@@ -21,62 +16,72 @@ export interface Stock {
   volume: number;
   marketCap?: number;
   sector?: string;
-  signals?: StockSignal[];
-  chart?: number[];
-}
+  aiScore?: number;
+  momentum?: number;
+  trend?: 'up' | 'down' | 'neutral';
+  sparkline?: number[];
+};
 
-export interface StockSignal {
-  type: 'BUY' | 'SELL' | 'HOLD';
-  confidence: number;
-  reason: string;
-  timeframe?: string;
-}
-
-export interface MarketIndex {
+export type MarketIndex = {
   symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
-}
+};
 
-export interface NewsItem {
+export type NewsItem = {
   id: string;
   title: string;
   summary: string;
   source: string;
   timestamp: string;
   sentiment: 'bullish' | 'bearish' | 'neutral';
-  tickers?: string[];
-}
+  tickers: string[];
+  url?: string;
+};
 
-export interface Alert {
+export type Alert = {
   id: string;
   ticker: string;
   message: string;
   timestamp: string;
   read: boolean;
-  type: 'price' | 'signal' | 'news';
-}
+  type: 'price' | 'volume' | 'news' | 'ai';
+};
 
-export interface WatchlistItem {
+export type WatchlistItem = {
   symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
-  chart?: number[];
+  targetPrice?: number;
   notes?: string;
-}
+};
 
-export interface PortfolioPosition {
+export type PortfolioPosition = {
   symbol: string;
   name: string;
   shares: number;
   avgCost: number;
   currentPrice: number;
-  value: number;
+  marketValue: number;
   gainLoss: number;
   gainLossPercent: number;
   sector?: string;
-}
+};
+
+export type TradeSignal = {
+  id: string;
+  symbol: string;
+  name: string;
+  action: 'buy' | 'sell' | 'hold';
+  confidence: number;
+  price: number;
+  targetPrice: number;
+  stopLoss: number;
+  reasoning: string;
+  timeframe: string;
+  timestamp: string;
+};
