@@ -13,27 +13,30 @@ export function loadProfile(): UserProfile | null {
 }
 
 export function saveProfile(profile: UserProfile): void {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  } catch {
+    // ignore
+  }
 }
 
 export function clearProfile(): void {
   localStorage.removeItem(PROFILE_KEY);
 }
 
-export function loadSettings(): AppSettings {
-  const defaults: AppSettings = {
-    theme: 'dark',
-    notifications: true,
-    riskLevel: 'moderate',
-  };
+export function loadSettings(): AppSettings | null {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...defaults, ...(JSON.parse(raw) as Partial<AppSettings>) } : defaults;
+    return raw ? (JSON.parse(raw) as AppSettings) : null;
   } catch {
-    return defaults;
+    return null;
   }
 }
 
 export function saveSettings(settings: AppSettings): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {
+    // ignore
+  }
 }
