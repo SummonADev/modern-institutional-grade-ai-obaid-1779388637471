@@ -1,14 +1,22 @@
-export type UserProfile = {
+export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  tradingStyle: 'day-trading' | 'swing' | 'long-term' | 'mixed';
-  experience: 'beginner' | 'intermediate' | 'advanced' | 'professional';
-  riskTolerance: 'conservative' | 'moderate' | 'aggressive';
-  joinedAt: string;
-};
+  avatar?: string;
+  preferredSectors?: string[];
+  riskTolerance?: 'conservative' | 'moderate' | 'aggressive';
+  tradingStyle?: 'day-trader' | 'swing-trader' | 'investor';
+}
 
-export type Stock = {
+export interface AppSettings {
+  theme: 'dark' | 'light';
+  notifications: boolean;
+  autoRefresh: boolean;
+  refreshInterval: number;
+  defaultView: string;
+}
+
+export interface Stock {
   symbol: string;
   name: string;
   price: number;
@@ -19,36 +27,52 @@ export type Stock = {
   sector?: string;
   aiScore?: number;
   momentum?: number;
-  trend?: 'bullish' | 'bearish' | 'neutral';
-  priceHistory?: number[];
-};
+  sentiment?: number;
+  risk?: number;
+  sparkline?: number[];
+}
 
-export type NewsItem = {
+export interface MarketIndex {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
+export interface Alert {
+  id: string;
+  ticker: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type?: 'bullish' | 'bearish' | 'neutral';
+}
+
+export interface NewsItem {
   id: string;
   title: string;
+  summary: string;
   source: string;
   timestamp: string;
-  sentiment: 'bullish' | 'bearish' | 'neutral';
-  tickers: string[];
-  summary?: string;
-  url?: string;
-};
+  tickers?: string[];
+  sentiment?: 'bullish' | 'bearish' | 'neutral';
+  category?: string;
+}
 
-export type PortfolioPosition = {
+export interface PortfolioPosition {
   symbol: string;
   name: string;
   shares: number;
   avgCost: number;
   currentPrice: number;
-  change: number;
-  changePercent: number;
   value: number;
   gainLoss: number;
   gainLossPercent: number;
   sector?: string;
-};
+}
 
-export type WatchlistItem = {
+export interface WatchlistItem {
   symbol: string;
   name: string;
   price: number;
@@ -56,28 +80,4 @@ export type WatchlistItem = {
   changePercent: number;
   aiScore?: number;
   notes?: string;
-  addedAt: string;
-};
-
-export type Alert = {
-  id: string;
-  ticker: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  type: 'price' | 'news' | 'technical' | 'ai';
-};
-
-export type MarketIndex = {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-};
-
-export type Sector = {
-  name: string;
-  performance: number;
-  momentum: string;
-};
+}

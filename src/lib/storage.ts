@@ -1,48 +1,46 @@
 import { UserProfile, AppSettings } from '@/types';
 
 const KEYS = {
-  PROFILE: 'user_profile',
-  SETTINGS: 'app_settings',
-  WATCHLIST: 'watchlist',
-  ONBOARDING: 'onboarding_complete',
+  USER_PROFILE: 'alphaedge_user_profile',
+  APP_SETTINGS: 'alphaedge_app_settings',
+  WATCHLIST: 'alphaedge_watchlist',
 };
 
-export const storage = {
-  getProfile(): UserProfile | null {
-    try {
-      const raw = localStorage.getItem(KEYS.PROFILE);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  },
+export function getStoredProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(KEYS.USER_PROFILE);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
-  setProfile(profile: UserProfile): void {
-    localStorage.setItem(KEYS.PROFILE, JSON.stringify(profile));
-  },
+export function setStoredProfile(profile: UserProfile): void {
+  localStorage.setItem(KEYS.USER_PROFILE, JSON.stringify(profile));
+}
 
-  getSettings(): AppSettings | null {
-    try {
-      const raw = localStorage.getItem(KEYS.SETTINGS);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  },
+export function getStoredSettings(): AppSettings | null {
+  try {
+    const raw = localStorage.getItem(KEYS.APP_SETTINGS);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
-  setSettings(settings: AppSettings): void {
-    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
-  },
+export function setStoredSettings(settings: AppSettings): void {
+  localStorage.setItem(KEYS.APP_SETTINGS, JSON.stringify(settings));
+}
 
-  isOnboardingComplete(): boolean {
-    return localStorage.getItem(KEYS.ONBOARDING) === 'true';
-  },
+export function getStoredWatchlist(): string[] {
+  try {
+    const raw = localStorage.getItem(KEYS.WATCHLIST);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
 
-  setOnboardingComplete(): void {
-    localStorage.setItem(KEYS.ONBOARDING, 'true');
-  },
-
-  clear(): void {
-    Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
-  },
-};
+export function setStoredWatchlist(symbols: string[]): void {
+  localStorage.setItem(KEYS.WATCHLIST, JSON.stringify(symbols));
+}
