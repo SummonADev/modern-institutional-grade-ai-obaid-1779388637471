@@ -1,55 +1,63 @@
-import { useState, useEffect, useContext, createContext } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { useState, useCallback } from 'react';
+import { UserProfile } from '@/types';
 
-export interface UserProfile {
-  name: string;
-  email: string;
-  avatar?: string;
+const PROFILE_KEY = 'alphaedge_profile';
+
+function loadProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
-export interface AuthState {
-  profile: UserProfile | null;
-  isAuthenticated: boolean;
-  updateProfile: (updates: Partial<UserProfile>) => void;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+function saveProfile(profile: UserProfile | null) {
+  if (profile) {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  } else {
+    localStorage.removeItem(PROFILE_KEY);
+  }
 }
 
-const defaultProfile: UserProfile = {
-  name: 'Alex Trader',
-  email: 'alex@alphaedge.io',
-};
+export function useAuth() {
+  const [profile, setProfile] = useState<UserProfile | null>(loadProfile);
 
-export function useAuth(): AuthState {
-  const [profile, setProfile] = useLocalStorage<UserProfile | null>('auth_profile', defaultProfile);
-  const [isAuthenticated, setIsAuthenticated] = useLocalStorage<boolean>('auth_isAuthenticated', true);
+  const login = useCallback((email: string, _password: string): { error?: string } => {
+    const newProfile: UserProfile = {
+      id: Date.now().toString(),
+      name: email.split('@')[0],
+      email,
+    };
+    setProfile(newProfile);
+    saveProfile(newProfile);
+    return {};
+  }, []);
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
-    setProfile(prev => prev ? { ...prev, ...updates } : prev);
-  };
+  const signup = useCallback((email: string, _password: string): { error?: string } => {
+    const newProfile: UserProfile = {
+      id: Date.now().toString(),
+      name: email.split('@')[0],
+      email,
+    };
+    setProfile(newProfile);
+    saveProfile(newProfile);
+    return {};
+  }, []);
 
-  const login = async (email: string, _password: string): Promise<void> => {
-    setProfile({ name: email.split('@')[0] || 'Trader', email });
-    setIsAuthenticated(true);
-  };
-
-  const signup = async (name: string, email: string, _password: string): Promise<void> => {
-    setProfile({ name, email });
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
+  const logout = useCallback(() => {
     setProfile(null);
-  };
+    saveProfile(null);
+  }, []);
 
-  return {
-    profile,
-    isAuthenticated,
-    updateProfile,
-    login,
-    signup,
-    logout,
-  };
+  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
+    setProfile(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      saveProfile(updated);
+      return updated;
+    });
+  }, []);
+
+  return { profile, login, signup, logout, updateProfile };
 }

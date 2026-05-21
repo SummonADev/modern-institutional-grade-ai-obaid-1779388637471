@@ -1,58 +1,37 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/hooks/useAuth';
+import { Card } from '@/components/ui/Card';
+import styles from './AuthPages.module.css';
 
 export function SettingsPage() {
-  const { profile, updateProfile, logout } = useAuth();
-  const [name, setName] = useState(profile?.name || '');
-  const [saved, setSaved] = useState(false);
-
-  const handleSave = () => {
-    updateProfile({ name });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+  const { profile } = useAuth();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '560px' }}>
-      <div>
-        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#e2e8f0', marginBottom: '4px' }}>Settings</h1>
-        <p style={{ fontSize: '13px', color: '#8b9ab0' }}>Manage your account and preferences</p>
-      </div>
-
+    <div style={{ maxWidth: 600, margin: '0 auto' }}>
+      <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--space-6)', color: 'var(--color-text-primary)' }}>
+        Settings
+      </h1>
       <Card padding="lg">
-        <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#c9d4e0', marginBottom: '16px' }}>Profile</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8b9ab0', marginBottom: '6px' }}>Display Name</label>
-            <input value={name} onChange={e => setName(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', background: '#131c2e', border: '1px solid #1e2d45', borderRadius: '8px', color: '#e2e8f0', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }} />
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--space-4)', color: 'var(--color-text-primary)' }}>
+          Profile
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3) 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>Name</span>
+            <span style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{profile?.name || 'Not set'}</span>
           </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8b9ab0', marginBottom: '6px' }}>Trading Style</label>
-            <div style={{ padding: '9px 12px', background: '#0d1424', border: '1px solid #1e2d45', borderRadius: '8px', color: '#8b9ab0', fontSize: '13px' }}>
-              {profile?.tradingStyle || 'Not set'}
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3) 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>Email</span>
+            <span style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{profile?.email || 'Not set'}</span>
           </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8b9ab0', marginBottom: '6px' }}>Experience Level</label>
-            <div style={{ padding: '9px 12px', background: '#0d1424', border: '1px solid #1e2d45', borderRadius: '8px', color: '#8b9ab0', fontSize: '13px' }}>
-              {profile?.experience || 'Not set'}
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3) 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>Trading Style</span>
+            <span style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{profile?.tradingStyle || 'Not set'}</span>
           </div>
-          <button onClick={handleSave}
-            style={{ padding: '10px 20px', background: '#2563eb', border: 'none', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}>
-            {saved ? 'Saved!' : 'Save Changes'}
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3) 0' }}>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>Experience</span>
+            <span style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{profile?.experience || 'Not set'}</span>
+          </div>
         </div>
-      </Card>
-
-      <Card padding="lg">
-        <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#c9d4e0', marginBottom: '16px' }}>Account</h2>
-        <button onClick={logout}
-          style={{ padding: '9px 18px', background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#ef4444', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
-          Sign Out
-        </button>
       </Card>
     </div>
   );

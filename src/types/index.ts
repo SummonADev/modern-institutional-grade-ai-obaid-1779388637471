@@ -1,186 +1,26 @@
-export type MarketRegime =
-  | 'Bullish'
-  | 'Neutral Bullish'
-  | 'Neutral'
-  | 'Neutral Bearish'
-  | 'Bearish'
-  | 'High Volatility Risk-Off';
-
-export type SetupType =
-  | 'Bull Flag'
-  | 'Opening Range Breakout'
-  | 'VWAP Reclaim'
-  | 'Fair Value Gap'
-  | 'Trend Continuation'
-  | 'Consolidation Breakout'
-  | 'Liquidity Sweep'
-  | 'Trend Reversal'
-  | 'Momentum Exhaustion';
-
-export type StockCategory =
-  | 'Early Growth Expansion'
-  | 'Fundamental Repricing'
-  | 'Institutional Accumulation'
-  | 'Strong Compounder'
-  | 'Momentum Building'
-  | 'Undervalued Growth'
-  | 'Near Peak'
-  | 'Overextended';
-
-export type EntryQuality =
-  | 'Excellent Entry'
-  | 'Good Entry'
-  | 'Neutral Entry'
-  | 'Risky Entry'
-  | 'Avoid Chasing';
-
-export type TradeSentiment = 'bullish' | 'bearish' | 'neutral';
-
-export interface DayTradeCandidate {
+export interface UserProfile {
   id: string;
-  ticker: string;
-  company: string;
-  setupType: SetupType;
-  confidenceScore: number;
-  entryZone: [number, number];
-  stopLoss: number;
-  takeProfits: [number, number, number];
-  riskReward: number;
-  currentPrice: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  relVolume: number;
-  float: number;
-  vwap: number;
-  atr: number;
-  catalystSummary: string;
-  aiReasoning: string;
-  patternExplanation: string;
-  vwapBehavior: string;
-  structureAnalysis: string;
-  volumeAnalysis: string;
-  keyRisks: string[];
-  regimeCompatibility: string;
-  momentumStrength: number;
-  liquidityScore: number;
-  structureScore: number;
-  catalystScore: number;
-  sector: string;
-  preMarketHigh: number;
-  preMarketLow: number;
+  name: string;
+  email: string;
+  tradingStyle?: string;
+  experience?: string;
+  onboardingComplete?: boolean;
 }
 
-export interface LongTermOpportunity {
-  id: string;
-  ticker: string;
-  company: string;
-  sector: string;
-  category: StockCategory;
-  opportunityScore: number;
-  entryQuality: EntryQuality;
-  currentPrice: number;
-  change: number;
-  changePercent: number;
-  marketCap: string;
-  targetPrice: number;
-  upside: number;
-  aiThesis: string;
-  businessModel: string;
-  growthDrivers: string[];
-  keyRisks: string[];
-  fundamentalScore: number;
-  growthScore: number;
-  valuationScore: number;
-  catalystScore: number;
-  institutionalScore: number;
-  sustainabilityScore: number;
-  aiConfidenceScore: number;
-  riskScore: number;
-  forwardPE: number;
-  pegRatio: number;
-  evEbitda: number;
-  priceToSales: number;
-  revenueGrowth: number;
-  marginTrend: string;
-  insiderActivity: string;
-  institutionalChange: string;
-  sharaiaCompliant: boolean;
-  analystTarget: number;
-  analystCount: number;
-}
-
-export interface PortfolioPosition {
-  id: string;
-  ticker: string;
-  company: string;
-  sector: string;
-  shares: number;
-  avgCost: number;
-  currentPrice: number;
-  marketValue: number;
-  unrealizedPL: number;
-  unrealizedPLPercent: number;
-  weight: number;
-  dayChange: number;
-  dayChangePercent: number;
-  entryDate: string;
-}
-
-export interface NewsItem {
-  id: string;
-  headline: string;
-  source: string;
-  ticker: string;
-  sentiment: TradeSentiment;
-  urgency: 'high' | 'medium' | 'low';
-  catalystStrength: number;
-  publishedAt: string;
-  summary: string;
-  aiAnalysis: string;
-  isNoise: boolean;
-}
-
-export interface WatchlistItem {
-  id: string;
-  ticker: string;
-  company: string;
+export interface Stock {
+  symbol: string;
+  name: string;
   price: number;
   change: number;
   changePercent: number;
   volume: number;
-  relVolume: number;
-  aiScore: number;
-  trend: TradeSentiment;
-  catalyst: string;
-  sector: string;
-}
-
-export interface WatchlistGroup {
-  id: string;
-  name: string;
-  items: WatchlistItem[];
-}
-
-export interface UserProfile {
-  name: string;
-  email: string;
-  investingStyle: 'day-trader' | 'long-term' | 'both';
-  riskTolerance: 'conservative' | 'moderate' | 'aggressive';
-  accountSize: string;
-  experience: string;
-  sectors: string[];
-  onboardingComplete: boolean;
-  shariahMode: boolean;
-  apiKeys: {
-    polygon: string;
-    fmp: string;
-    benzinga: string;
-    alpaca: string;
-    alpacaSecret: string;
-    openai: string;
-    anthropic: string;
-  };
+  marketCap?: number;
+  sector?: string;
+  aiScore?: number;
+  momentum?: number;
+  sentiment?: number;
+  riskScore?: number;
+  sparkline?: number[];
 }
 
 export interface MarketIndex {
@@ -189,15 +29,88 @@ export interface MarketIndex {
   price: number;
   change: number;
   changePercent: number;
-  trend: TradeSentiment;
+}
+
+export interface NewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  timestamp: string;
+  sentiment: 'bullish' | 'bearish' | 'neutral';
+  tickers: string[];
+  url?: string;
 }
 
 export interface Alert {
   id: string;
-  type: 'breakout' | 'volume' | 'earnings' | 'score' | 'regime' | 'risk' | 'watchlist';
   ticker: string;
   message: string;
-  urgency: 'high' | 'medium' | 'low';
   timestamp: string;
   read: boolean;
+  type: 'price' | 'volume' | 'news' | 'ai';
+}
+
+export interface PortfolioPosition {
+  symbol: string;
+  name: string;
+  shares: number;
+  avgCost: number;
+  currentPrice: number;
+  change: number;
+  changePercent: number;
+  value: number;
+  gainLoss: number;
+  gainLossPercent: number;
+  sector?: string;
+  aiScore?: number;
+}
+
+export interface WatchlistItem {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  aiScore?: number;
+  notes?: string;
+  addedAt: string;
+}
+
+export interface TradeSignal {
+  id: string;
+  symbol: string;
+  name: string;
+  action: 'BUY' | 'SELL' | 'HOLD';
+  confidence: number;
+  price: number;
+  targetPrice: number;
+  stopLoss: number;
+  timeframe: string;
+  reasoning: string;
+  aiScore: number;
+  risk: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
+export interface SectorData {
+  name: string;
+  performance: number;
+  momentum: number;
+  aiScore: number;
+}
+
+export interface ChartDataPoint {
+  time: string;
+  value: number;
+  volume?: number;
+}
+
+export interface ScreenerFilter {
+  minPrice?: number;
+  maxPrice?: number;
+  minVolume?: number;
+  minAiScore?: number;
+  sectors?: string[];
+  signals?: ('BUY' | 'SELL' | 'HOLD')[];
 }
