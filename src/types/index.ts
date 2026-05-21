@@ -1,8 +1,6 @@
-export type AssetClass = 'stocks' | 'options' | 'crypto' | 'etfs' | 'forex';
-
+export type Plan = 'free' | 'pro' | 'elite';
 export type RiskTolerance = 'conservative' | 'moderate' | 'aggressive';
-
-export type Plan = 'free' | 'pro' | 'enterprise';
+export type AssetType = 'stocks' | 'crypto' | 'forex' | 'options';
 
 export interface UserProfile {
   id: string;
@@ -10,16 +8,10 @@ export interface UserProfile {
   email: string;
   plan: Plan;
   riskTolerance: RiskTolerance;
-  preferredAssets: AssetClass[];
+  preferredAssets: AssetType[];
   onboardingComplete: boolean;
-}
-
-export interface AppSettings {
-  theme: 'dark' | 'light';
-  notifications: boolean;
-  soundAlerts: boolean;
-  defaultView: string;
-  currency: string;
+  tradingStyle?: string;
+  experience?: string;
 }
 
 export interface Stock {
@@ -28,27 +20,45 @@ export interface Stock {
   price: number;
   change: number;
   changePercent: number;
-  volume: string;
-  marketCap: string;
+  volume: number;
+  marketCap: number;
   sector: string;
   aiScore: number;
   momentum: number;
-  sentiment: number;
-  riskScore: number;
+  trend: 'bullish' | 'bearish' | 'neutral';
   sparkline: number[];
 }
 
-export interface MarketIndex {
+export interface PortfolioPosition {
+  symbol: string;
+  name: string;
+  shares: number;
+  avgCost: number;
+  currentPrice: number;
+  value: number;
+  gainLoss: number;
+  gainLossPercent: number;
+  sector: string;
+  aiScore: number;
+  allocation: number;
+}
+
+export interface WatchlistItem {
   symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
+  volume: number;
+  aiScore: number;
+  trend: 'bullish' | 'bearish' | 'neutral';
+  sparkline: number[];
+  note?: string;
 }
 
 export interface NewsItem {
   id: string;
-  headline: string;
+  title: string;
   source: string;
   timestamp: string;
   sentiment: 'bullish' | 'bearish' | 'neutral';
@@ -63,41 +73,34 @@ export interface Alert {
   message: string;
   timestamp: string;
   read: boolean;
-  type: 'price' | 'volume' | 'ai' | 'news';
+  type: 'price' | 'signal' | 'news';
 }
 
-export interface PortfolioPosition {
-  symbol: string;
-  name: string;
-  shares: number;
-  avgCost: number;
-  currentPrice: number;
-  value: number;
-  gain: number;
-  gainPercent: number;
-  sector: string;
-  aiScore: number;
-}
-
-export interface WatchlistItem {
+export interface MarketIndex {
   symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
-  aiScore: number;
-  notes?: string;
 }
 
-export interface TradeSignal {
+export interface Trade {
   id: string;
   symbol: string;
-  type: 'BUY' | 'SELL' | 'HOLD';
+  side: 'buy' | 'sell';
+  quantity: number;
+  price: number;
+  timestamp: string;
+  status: 'filled' | 'pending' | 'cancelled';
+  pnl?: number;
+}
+
+export interface AISignal {
+  symbol: string;
+  action: 'buy' | 'sell' | 'hold';
   confidence: number;
-  entry: number;
-  target: number;
+  reason: string;
+  targetPrice: number;
   stopLoss: number;
   timeframe: string;
-  reasoning: string;
-  timestamp: string;
 }
