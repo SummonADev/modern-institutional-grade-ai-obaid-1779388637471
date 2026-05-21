@@ -1,24 +1,14 @@
-export type Plan = 'free' | 'pro' | 'elite';
-export type RiskTolerance = 'low' | 'medium' | 'high';
-
-export interface UserProfile {
+export type UserProfile = {
   id: string;
   name: string;
   email: string;
-  plan: Plan;
-  riskTolerance: RiskTolerance;
-  joinedAt: string;
+  plan?: string;
   tradingStyle?: string;
   experience?: string;
-}
+  riskTolerance?: string;
+};
 
-export interface AppSettings {
-  theme: 'dark' | 'light';
-  notifications: boolean;
-  defaultView: string;
-}
-
-export interface Stock {
+export type Stock = {
   symbol: string;
   name: string;
   price: number;
@@ -28,48 +18,52 @@ export interface Stock {
   marketCap?: number;
   sector?: string;
   aiScore?: number;
-  sentiment?: 'bullish' | 'bearish' | 'neutral';
-  chartData?: number[];
-}
+  momentum?: number;
+  trend?: 'bullish' | 'bearish' | 'neutral';
+  sparkline?: number[];
+};
 
-export interface Alert {
+export type WatchlistItem = {
   id: string;
-  ticker: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  type?: 'price' | 'news' | 'ai';
-}
-
-export interface MarketIndex {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-}
-
-export interface NewsItem {
-  id: string;
-  title: string;
-  source: string;
-  timestamp: string;
-  sentiment: 'bullish' | 'bearish' | 'neutral';
-  tickers?: string[];
-  summary?: string;
-}
-
-export interface WatchlistItem {
   symbol: string;
   name: string;
   price: number;
   change: number;
   changePercent: number;
   aiScore?: number;
-  chartData?: number[];
-}
+  notes?: string;
+  addedAt: string;
+};
 
-export interface PortfolioPosition {
+export type NewsItem = {
+  id: string;
+  title: string;
+  source: string;
+  timestamp: string;
+  sentiment: 'bullish' | 'bearish' | 'neutral';
+  tickers: string[];
+  summary?: string;
+  url?: string;
+};
+
+export type Alert = {
+  id: string;
+  ticker: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'price' | 'volume' | 'ai' | 'news';
+};
+
+export type MarketIndex = {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+};
+
+export type PortfolioPosition = {
   symbol: string;
   name: string;
   shares: number;
@@ -78,5 +72,11 @@ export interface PortfolioPosition {
   marketValue: number;
   gainLoss: number;
   gainLossPercent: number;
-  aiScore?: number;
-}
+  sector?: string;
+};
+
+export type ChartDataPoint = {
+  time: string;
+  value: number;
+  volume?: number;
+};

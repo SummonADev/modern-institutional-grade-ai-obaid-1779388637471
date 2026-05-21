@@ -1,39 +1,51 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { UserProfile } from '@/types';
+import { loadProfile, saveProfile } from '@/lib/storage';
 
-export type UserProfile = {
-  id: string;
-  name: string;
-  email: string;
-};
-
-const DEFAULT_USER: UserProfile = {
-  id: 'default-user',
-  name: 'Trader',
-  email: 'trader@platform.com',
-};
-
-type AuthState = {
-  user: UserProfile | null;
+export type AuthHook = {
   profile: UserProfile | null;
-  loading: boolean;
-};
-
-type AuthHook = AuthState & {
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
+  updateProfile: (updates: Partial<UserProfile>) => void;
   logout: () => void;
 };
 
 export function useAuth(): AuthHook {
-  const [state] = useState<AuthState>({
-    user: DEFAULT_USER,
-    profile: DEFAULT_USER,
-    loading: false,
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    const saved = loadProfile();
+    if (saved) return saved;
+    return {
+      id: 'local-user',
+      name: 'Trader',
+      email: 'trader@alphaedge.com',
+      plan: 'free',
+      tradingStyle: 'swing',
+      experience: 'intermediate',
+      riskTolerance: 'medium',
+    };
   });
 
-  const login = async (_email: string, _password: string): Promise<void> => {};
-  const signup = async (_name: string, _email: string, _password: string): Promise<void> => {};
-  const logout = () => {};
+  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...updates };
+      saveProfile(next);
+      return next;
+    });
+  }, []);
 
-  return { ...state, login, signup, logout };
+  const logout = useCallback(() => {
+    // client-side only — just reset to default
+    const defaultProfile: UserProfile = {
+      id: 'local-user',
+      name: 'Trader',
+      email: 'trader@alphaedge.com',
+      plan: 'free',
+      tradingStyle: 'swing',
+      experience: 'intermediate',
+      riskTolerance: 'medium',
+    };
+    setProfile(defaultProfile);
+    saveProfile(defaultProfile);
+  }, []);
+
+  return { profile, updateProfile, logout };
 }
