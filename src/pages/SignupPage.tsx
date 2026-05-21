@@ -1,5 +1,5 @@
-import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import styles from './AuthPages.module.css';
@@ -10,39 +10,40 @@ export function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    setError(null);
-    const result = signup(name, email, password);
-    setLoading(false);
-    if (result.error) {
-      setError(result.error);
-    } else {
-      navigate('/');
+    try {
+      const result = await signup(name, email, password);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        navigate('/onboarding');
+      }
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <AuthLayout>
       <div className={styles.card}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Create account</h1>
-          <p className={styles.subtitle}>Start trading smarter with AI insights</p>
-        </div>
+        <h1 className={styles.title}>Create account</h1>
+        <p className={styles.subtitle}>Start trading smarter with AlphaEdge</p>
         <form onSubmit={handleSubmit} className={styles.form}>
           {error && <div className={styles.error}>{error}</div>}
           <div className={styles.field}>
             <label className={styles.label}>Name</label>
             <input
               type="text"
-              className={styles.input}
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="John Doe"
+              className={styles.input}
+              placeholder="Your name"
               required
             />
           </div>
@@ -50,10 +51,10 @@ export function SignupPage() {
             <label className={styles.label}>Email</label>
             <input
               type="email"
-              className={styles.input}
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="trader@example.com"
+              className={styles.input}
+              placeholder="you@example.com"
               required
             />
           </div>
@@ -61,9 +62,9 @@ export function SignupPage() {
             <label className={styles.label}>Password</label>
             <input
               type="password"
-              className={styles.input}
               value={password}
               onChange={e => setPassword(e.target.value)}
+              className={styles.input}
               placeholder="••••••••"
               required
             />
@@ -72,10 +73,9 @@ export function SignupPage() {
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
-        <div className={styles.footer}>
-          Already have an account?{' '}
-          <a href="/login" className={styles.link}>Sign in</a>
-        </div>
+        <p className={styles.footer}>
+          Already have an account? <Link to="/login" className={styles.link}>Sign in</Link>
+        </p>
       </div>
     </AuthLayout>
   );

@@ -1,46 +1,74 @@
 import { useState, useCallback } from 'react';
-import { useLocalStorage } from './useLocalStorage';
-import { UserProfile } from '@/types/index';
+import { UserProfile } from '@/types';
 
-export type UseAuthReturn = {
+export interface UseAuthReturn {
   profile: UserProfile | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  signup: (name: string, email: string, password: string) => Promise<{ error?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
-};
+}
 
-const DEFAULT_PROFILE: UserProfile = {
-  id: '1',
-  name: 'Alex Trader',
-  email: 'alex@alphaedge.io',
-  plan: 'pro',
-  tradingStyle: 'swing',
-  experience: 'intermediate',
-  riskTolerance: 'moderate',
-};
+const STORAGE_KEY = 'alphaedge_user';
+
+function loadProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveProfile(profile: UserProfile | null) {
+  if (profile) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
 
 export function useAuth(): UseAuthReturn {
-  const [profile, setProfile] = useLocalStorage<UserProfile | null>('auth_profile', DEFAULT_PROFILE);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(profile !== null);
+  const [profile, setProfile] = useState<UserProfile | null>(loadProfile);
 
-  const login = useCallback(async (email: string, _password: string) => {
+  const isAuthenticated = profile !== null;
+
+  const login = useCallback(async (email: string, _password: string): Promise<{ error?: string }> => {
     const newProfile: UserProfile = {
-      ...DEFAULT_PROFILE,
+      id: Date.now().toString(),
+      name: email.split('@')[0],
       email,
     };
+    saveProfile(newProfile);
     setProfile(newProfile);
-    setIsAuthenticated(true);
-  }, [setProfile]);
+    return {};
+  }, []);
+
+  const signup = useCallback(async (name: string, email: string, _password: string): Promise<{ error?: string }> => {
+    const newProfile: UserProfile = {
+      id: Date.now().toString(),
+      name,
+      email,
+    };
+    saveProfile(newProfile);
+    setProfile(newProfile);
+    return {};
+  }, []);
 
   const logout = useCallback(() => {
+    saveProfile(null);
     setProfile(null);
-    setIsAuthenticated(false);
-  }, [setProfile]);
+  }, []);
 
   const updateProfile = useCallback((updates: Partial<UserProfile>) => {
-    setProfile((prev) => prev ? { ...prev, ...updates } : prev);
-  }, [setProfile]);
+    setProfile((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      saveProfile(updated);
+      return updated;
+    });
+  }, []);
 
-  return { profile, isAuthenticated, login, logout, updateProfile };
+  return { profile, isAuthenticated, login, signup, logout, updateProfile };
 }

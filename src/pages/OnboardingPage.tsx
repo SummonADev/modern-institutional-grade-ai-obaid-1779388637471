@@ -1,58 +1,59 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import styles from './AuthPages.module.css';
 
 export function OnboardingPage() {
   const { updateProfile } = useAuth();
   const navigate = useNavigate();
-  const [tradingStyle, setTradingStyle] = useState('');
-  const [experience, setExperience] = useState('');
+  const [tradingStyle, setTradingStyle] = useState('swing');
+  const [experience, setExperience] = useState('intermediate');
 
-  const handleSubmit = () => {
-    updateProfile({ onboardingComplete: true, tradingStyle, experience });
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    updateProfile({ tradingStyle, experience });
     navigate('/');
-  };
+  }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-primary)' }}>
-      <div style={{ width: '100%', maxWidth: 480, padding: '2rem', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
-        <h2 style={{ color: 'var(--color-text-primary)', marginBottom: '1.5rem', fontSize: 'var(--text-xl)', fontWeight: 700 }}>Welcome! Let's set up your profile</h2>
-
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem' }}>Trading Style</label>
-          <select
-            value={tradingStyle}
-            onChange={e => setTradingStyle(e.target.value)}
-            style={{ width: '100%', padding: '0.5rem', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)' }}
-          >
-            <option value="">Select...</option>
-            <option value="day-trader">Day Trader</option>
-            <option value="swing-trader">Swing Trader</option>
-            <option value="investor">Long-Term Investor</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem' }}>Experience Level</label>
-          <select
-            value={experience}
-            onChange={e => setExperience(e.target.value)}
-            style={{ width: '100%', padding: '0.5rem', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)' }}
-          >
-            <option value="">Select...</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
-
-        <button
-          onClick={handleSubmit}
-          style={{ width: '100%', padding: '0.75rem', background: 'var(--color-accent-blue)', border: 'none', borderRadius: 'var(--radius-md)', color: 'white', fontWeight: 600, cursor: 'pointer' }}
-        >
-          Get Started
-        </button>
+    <AuthLayout>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Set up your profile</h1>
+        <p className={styles.subtitle}>Help us personalize your trading experience</p>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.field}>
+            <label className={styles.label}>Trading Style</label>
+            <select
+              value={tradingStyle}
+              onChange={e => setTradingStyle(e.target.value)}
+              className={styles.input}
+            >
+              <option value="scalping">Scalping</option>
+              <option value="day">Day Trading</option>
+              <option value="swing">Swing Trading</option>
+              <option value="position">Position Trading</option>
+              <option value="investing">Long-term Investing</option>
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Experience Level</label>
+            <select
+              value={experience}
+              onChange={e => setExperience(e.target.value)}
+              className={styles.input}
+            >
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+              <option value="professional">Professional</option>
+            </select>
+          </div>
+          <button type="submit" className={styles.btn}>
+            Get Started
+          </button>
+        </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
