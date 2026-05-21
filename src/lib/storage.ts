@@ -3,53 +3,46 @@ import { UserProfile, AppSettings } from '@/types';
 const PROFILE_KEY = 'alphaedge_profile';
 const SETTINGS_KEY = 'alphaedge_settings';
 
-const DEFAULT_PROFILE: UserProfile = {
-  id: '1',
-  name: 'Alex Trader',
-  email: 'alex@alphaedge.io',
-  plan: 'pro',
-  riskTolerance: 'moderate',
-  preferredAssets: ['stocks', 'options'],
-  onboardingComplete: true,
-};
-
-const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'dark',
-  notifications: true,
-  soundAlerts: false,
-  defaultView: 'dashboard',
-  currency: 'USD',
-};
-
-export function getProfile(): UserProfile {
+export function saveProfile(profile: UserProfile): void {
   try {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    if (!raw) return DEFAULT_PROFILE;
-    return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   } catch {
-    return DEFAULT_PROFILE;
+    // ignore
   }
 }
 
-export function saveProfile(profile: UserProfile): void {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+export function loadProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as UserProfile;
+  } catch {
+    return null;
+  }
 }
 
-export function getSettings(): AppSettings {
+export function clearProfile(): void {
   try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    localStorage.removeItem(PROFILE_KEY);
   } catch {
-    return DEFAULT_SETTINGS;
+    // ignore
   }
 }
 
 export function saveSettings(settings: AppSettings): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {
+    // ignore
+  }
 }
 
-export function clearStorage(): void {
-  localStorage.removeItem(PROFILE_KEY);
-  localStorage.removeItem(SETTINGS_KEY);
+export function loadSettings(): AppSettings | null {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as AppSettings;
+  } catch {
+    return null;
+  }
 }

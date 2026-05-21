@@ -2,40 +2,47 @@ import { useState, useCallback } from 'react';
 import { UserProfile } from '@/types';
 import { loadProfile, saveProfile, clearProfile } from '@/lib/storage';
 
-export function useAuth() {
+type AuthResult = { error: string | null };
+
+interface UseAuthReturn {
+  profile: UserProfile | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => AuthResult;
+  signup: (name: string, email: string, password: string) => AuthResult;
+  logout: () => void;
+}
+
+export function useAuth(): UseAuthReturn {
   const [profile, setProfile] = useState<UserProfile | null>(() => loadProfile());
 
-  const login = useCallback((email: string, _password: string) => {
+  const login = useCallback((email: string, _password: string): AuthResult => {
+    // Mock login — accept any credentials
     const existing = loadProfile();
     if (existing && existing.email === email) {
       setProfile(existing);
-      return;
+      return { error: null };
     }
     const newProfile: UserProfile = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(),
       name: email.split('@')[0],
       email,
-      plan: 'free',
-      riskTolerance: 'moderate',
-      preferredAssets: ['stocks'],
-      onboardingComplete: false,
+      createdAt: new Date().toISOString(),
     };
     saveProfile(newProfile);
     setProfile(newProfile);
+    return { error: null };
   }, []);
 
-  const signup = useCallback((name: string, email: string, _password: string) => {
+  const signup = useCallback((name: string, email: string, _password: string): AuthResult => {
     const newProfile: UserProfile = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(),
       name,
       email,
-      plan: 'free',
-      riskTolerance: 'moderate',
-      preferredAssets: ['stocks'],
-      onboardingComplete: false,
+      createdAt: new Date().toISOString(),
     };
     saveProfile(newProfile);
     setProfile(newProfile);
+    return { error: null };
   }, []);
 
   const logout = useCallback(() => {
@@ -43,14 +50,11 @@ export function useAuth() {
     setProfile(null);
   }, []);
 
-  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
-    setProfile(prev => {
-      if (!prev) return prev;
-      const updated = { ...prev, ...updates };
-      saveProfile(updated);
-      return updated;
-    });
-  }, []);
-
-  return { profile, login, signup, logout, updateProfile };
+  return {
+    profile,
+    isAuthenticated: profile !== null,
+    login,
+    signup,
+    logout,
+  };
 }
